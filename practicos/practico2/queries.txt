@@ -1,0 +1,69 @@
+SELECT * FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+# 1)
+
+SELECT ST_AsText(geom) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+SELECT ST_AsEWKT(geom) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+SELECT ST_AsGML(geom) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+SELECT ST_AsKML(geom) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+SELECT ST_AsGeoJSON(geom) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+
+# 2)
+
+SELECT sum(ST_LENGTH(geom)) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+
+# 3)
+
+SELECT ST_AsText(ST_Union(geom)) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+-> MULTILINESTRING((575074.7132902959 6136569.026442854,575066.776369585 6136665.31721075),(575058.......
+
+
+# 4)
+
+SELECT ST_AsText(ST_LineMerge(ST_Union(geom))) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+# 5)
+
+SELECT ST_Length(ST_Union(geom)) FROM ft_vias WHERE nom_calle = 'MAGALLANES';
+
+# 6)
+
+SELECT ST_Area(st_transform(geom, 32721))/1000000 FROM ft_limites_departamentales WHERE depto = 'FLORIDA';
+
+# 7)
+
+SELECT ST_NPoints(geom) FROM ft_limites_departamentales WHERE depto = 'MONTEVIDEO';
+
+# 8)
+
+SELECT d.depto
+FROM ft_limites_departamentales d JOIN ft_vias v ON ST_Contains(st_transform(d.geom, 32721), v.geom)
+WHERE v.nom_calle = 'MAGALLANES'
+GROUP BY d.depto;
+
+#9)
+
+SELECT DISTINCT v2.nom_calle
+FROM ft_vias v1 JOIN ft_vias v2 ON ST_Intersects(v1.geom, v2.geom)
+WHERE v1.nom_calle = 'MAGALLANES' AND v2.nom_calle != 'MAGALLANES';
+
+#10)
+WITH interseccion AS (
+  SELECT ST_Buffer(ST_Intersection(v1.geom, v2.geom), 15) AS geom
+  FROM ft_vias v1
+  JOIN ft_vias v2
+    ON ST_Intersects(v1.geom, v2.geom)
+  WHERE v1.nom_calle = 'MAGALLANES'
+	    AND v2.nom_calle = 'COLONIA'
+)
+SELECT m.*
+FROM ft_manzanas m
+JOIN interseccion i
+  ON ST_Intersects(m.geom, i.geom);
+
