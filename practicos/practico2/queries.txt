@@ -67,3 +67,25 @@ FROM ft_manzanas m
 JOIN interseccion i
   ON ST_Intersects(m.geom, i.geom);
 
+
+#11)
+
+#a)
+SELECT v.*
+FROM ft_vias v
+JOIN ft_manzanas m ON ST_Touches(v.geom, m.geom);
+
+#b)
+SELECT v.*
+FROM ft_vias v
+JOIN ft_manzanas m ON ST_Within(v.geom, m.geom);
+
+#c)
+SELECT v.*
+FROM ft_vias v
+JOIN ft_manzanas m
+  ON ST_Contains(m.geom, ST_StartPoint(v.geom))
+     OR ST_Contains(m.geom, ST_EndPoint(v.geom));
+
+#d)
+
